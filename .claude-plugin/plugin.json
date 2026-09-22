@@ -1,0 +1,10 @@
+{
+  "name": "gbp-maa-skills",
+  "description": "Google Business Profile MAA skill suite for local service businesses: the weekly gbp-maa report (Metrics → Analysis → Action) and the gbp-client-view one-page renderer. Pairs with the read-only gbp-mcp (Cloud Run) and the Pipedream GBP proxy included in this repository. No data warehouse; every number is read live from Google.",
+  "version": "1.0.0",
+  "author": { "name": "Goodrich-Dev", "url": "https://github.com/Goodrich-Dev" },
+  "homepage": "https://github.com/Local-Service-Spotlight/gbp-maa-skills",
+  "repository": "https://github.com/Local-Service-Spotlight/gbp-maa-skills",
+  "license": "MIT",
+  "keywords": ["google-business-profile", "gbp", "maps", "maa", "local-service", "reporting", "mcp"]
+}
