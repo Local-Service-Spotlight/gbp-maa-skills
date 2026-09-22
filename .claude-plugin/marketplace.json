@@ -1,7 +1,7 @@
 {
   "name": "gbp-maa-skills",
   "owner": { "name": "Local-Service-Spotlight", "url": "https://github.com/Local-Service-Spotlight" },
-  "metadata": { "description": "Single-plugin marketplace for the Google Business Profile MAA skill suite.", "version": "1.0.0" },
+  "metadata": { "description": "Single-plugin marketplace for the Google Business Profile MAA skill suite.", "version": "1.0.1" },
   "plugins": [
     { "name": "gbp-maa-skills", "source": "./", "description": "GBP MAA skill suite: weekly Maps report (gbp-maa) and client-view renderer (gbp-client-view). Live data through the read-only gbp-mcp; no warehouse.", "category": "marketing", "strict": false }
   ]

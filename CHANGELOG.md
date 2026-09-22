@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.1, 2026-09-22
+
+Task Library conformance: frontmatter `category` set to the canonical `Strategy & Measurement`, `stage` to `—`, `definitive_article` to `GAP — to be written`; added the `**Use this when**` line and the `(QA checklist)` heading the validator requires. No procedure changes.
+
 ## 1.0.0, 2026-09-22
 
 First release. Built and first-run on 2026-09-21 (see `docs/meta/2026-09-21-gbp-agent-stage1.md`).

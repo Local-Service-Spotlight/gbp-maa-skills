@@ -3,9 +3,9 @@ name: gbp-maa
 description: "Produce the weekly Google Business Profile (GBP) report for any local business using the gbp_mcp connector (Pipedream proxy → Cloud Run MCP; no data warehouse). Establishes data trust first (roster check, reporting-lag cutoff, duplicate/closed/unverified screens), picks the vertical's primary action metric, answers the owner questions (are more people finding us on Maps, are they acting, what changed, what to do), and outputs the client-facing report in the Local Service Spotlight format. Also runs the Maps Visibility Trial verdict (trial vs 3x baseline) as a second mode. Trigger on: \"GBP report/MAA for [client]\", \"Maps report\", \"run the GBP agent\", \"how is [client]'s Google Business Profile doing\", \"are we showing up on Maps\", \"trial verdict for [client]\", weekly GBP reporting runs, or any request to analyze a Google Business Profile. GBP only — website behavior belongs to the GA4 agent, paid to Google Ads, organic search terms to GSC."
 author: Daniel Goodrich — Local Service Spotlight
 version: 1.0.0
-category: client-operations
-stage: optimization
-definitive_article: GAP
+category: Strategy & Measurement
+stage: —
+definitive_article: GAP — to be written
 status: needs-work
 lane: judgment
 references:
@@ -18,6 +18,8 @@ references:
 ---
 
 # GBP Report (any local business)
+
+**Use this when** a client's weekly Google Business Profile (Maps) report is due, a first GBP report is needed for a new client, or someone asks how a profile is doing on Maps.
 
 ## Executive Summary
 
@@ -52,7 +54,7 @@ This skill produces the weekly Google Business Profile report that goes to a bus
 
 The full procedure for each phase is below under "Run modes" onward.
 
-## Definition of done
+## Definition of done (QA checklist)
 
 - [ ] Working table exists with every number re-summed from daily rows; sums equal Google's totals (assertion output pasted in the internal notes).
 - [ ] Window used equals `gbp_get_data_freshness` output with `lag_days: 8`; no date after `end_date` appears anywhere.
@@ -61,6 +63,7 @@ The full procedure for each phase is below under "Run modes" onward.
 - [ ] Self-grade against `references/grading-rubric.md` recorded; one revision on any fail.
 - [ ] Report saved to `{client_vault}/{client}/MAAs-GBP/YYYY-MM-DD.md` and read back; config `run_history` appended and `profile_snapshot` replaced.
 - [ ] Recurring: tripwire results recorded; any fired tripwire carries the team-review banner.
+- [ ] Linked back to the definitive article (GAP noted) and to `gbp-client-view` / `ga4-website-maa` as siblings.
 - [ ] Hand-off named: the receiving task is `gbp-client-view` (render) and, for a fired tripwire, the analytics function (review).
 
 ## Example(s)

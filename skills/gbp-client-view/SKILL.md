@@ -3,9 +3,9 @@ name: gbp-client-view
 description: Render a finished GBP MAA (from gbp-maa) into the client-facing one-page executive summary (print-ready PDF + self-contained HTML), following the Local Service Spotlight display standard shared with ga4-client-view: stoplight coloring, a "prepared by" human owner, the client logo, the two standard charts (13-week primary-action trend + actions-by-type bars), an owned "what to do next" checklist, a source-citations footer, and "we" voice. It does NO new analysis; every value is DERIVED from the source MAA, never invented. Runs as the final step after gbp-maa writes the report. Trigger on "render the GBP client view", "make the Maps report pretty", "display version of the GBP MAA", "GBP one-pager for {client}".
 author: Daniel Goodrich — Local Service Spotlight
 version: 1.0.0
-category: client-operations
-stage: optimization
-definitive_article: GAP
+category: Strategy & Measurement
+stage: —
+definitive_article: GAP — to be written
 status: needs-work
 lane: execution
 references:
@@ -17,6 +17,8 @@ references:
 ---
 
 # GBP Client View
+
+**Use this when** a finished GBP MAA needs the client-facing one-page executive summary before it is sent.
 
 ## Executive Summary
 
@@ -37,7 +39,7 @@ This skill turns a finished Google Business Profile report into a single page an
 4. Render with `scripts/render_page1.py`, then `scripts/render_pdf.py`; merge with the MAA PDF if supplied.
 5. Verify (Step 5) and deliver as a draft.
 
-## Definition of done
+## Definition of done (QA checklist)
 
 - [ ] Every pill, flag, chart point, and action traces to a line in the MAA (trace list in the delivery note).
 - [ ] Right-chart rows sum to the MAA's total actions; four pills equal the MAA's numbers table; chart endpoint equals the latest weekly value.
