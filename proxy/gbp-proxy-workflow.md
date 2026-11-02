@@ -315,10 +315,17 @@ export default defineComponent({
         const account = await resolveAccount(loc, b.account_id);
         const out = { account_id: account };
         try {
-          const m = await get(`${V4}/${account}/${loc}/media`, { pageSize: 100 });
-          const items = m.mediaItems || [];
+          const items = [];
+          let pageToken, total = null;
+          do {
+            const m = await get(`${V4}/${account}/${loc}/media`, { pageSize: 100, pageToken });
+            total = m.totalMediaItemCount ?? total;
+            items.push(...(m.mediaItems || []));
+            pageToken = m.nextPageToken;
+          } while (pageToken && items.length < 1000);
           out.media = {
-            total_count: m.totalMediaItemCount ?? items.length,
+            total_count: total ?? items.length,
+            counted: items.length,
             latest_created_at: items.map((i) => i.createTime).filter(Boolean).sort().pop() || null,
             by_format: items.reduce((acc, i) => { acc[i.mediaFormat] = (acc[i.mediaFormat] || 0) + 1; return acc; }, {}),
           };

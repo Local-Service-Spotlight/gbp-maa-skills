@@ -21,7 +21,7 @@ proxy key.
 | `GBP_PROXY_URL` | yes | `https://YOUR-TRIGGER.m.pipedream.net` |
 | `GBP_PROXY_KEY` | yes | same value as the Pipedream `GBP_PROXY_KEY` secret |
 | `MCP_BEARER_TOKEN` | recommended | any long random string; clients send `Authorization: Bearer <token>` |
-| `GBP_LAG_DAYS` | no | default 5; set to 8 in production (impressions lag ~8 days, actions less) |
+| `GBP_LAG_DAYS` | no | default 5; production runs 10 (impressions post about 10 days late, actions sooner; verified 2026-09-24) |
 
 ## Local test
 
@@ -47,7 +47,7 @@ gcloud run deploy gbp-mcp \
   --source . \
   --region $REGION \
   --allow-unauthenticated \
-  --set-env-vars GBP_PROXY_URL=https://YOUR-TRIGGER.m.pipedream.net,GBP_LAG_DAYS=5 \
+  --set-env-vars GBP_PROXY_URL=https://YOUR-TRIGGER.m.pipedream.net,GBP_LAG_DAYS=10 \
   --set-secrets GBP_PROXY_KEY=gbp-proxy-key:latest,MCP_BEARER_TOKEN=gbp-mcp-token:latest \
   --min-instances 0 --max-instances 3 --memory 512Mi --timeout 300
 ```
