@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased (live fixes recorded 2026-11-02)
+
+- proxy/gbp-proxy-workflow.md: matches the live Pipedream workflow. Media now pages through up to 1,000 items (was first page only); verified 159/159/159 on a test location.
+- mcp/README.md: production GBP_LAG_DAYS is 10 (set on Cloud Run gbp-mcp). The gbp-maa skill still passes lag_days 8; moving it to 10 is queued for 1.0.2.
+
 ## 1.0.0, 2026-09-22
 
 First release. Built and first-run on 2026-09-21 (see `docs/meta/2026-09-21-gbp-agent-stage1.md`).
