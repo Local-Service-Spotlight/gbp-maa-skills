@@ -27,9 +27,10 @@ proxy key.
 
 ```bash
 pip install -r requirements.txt
-GBP_PROXY_URL=... GBP_PROXY_KEY=... python server.py
+GBP_PROXY_URL=... GBP_PROXY_KEY=... MCP_BEARER_TOKEN=... python server.py
 # in another shell
-npx @modelcontextprotocol/inspector   # connect to http://localhost:8080/mcp
+npx @modelcontextprotocol/inspector   # connect to http://localhost:8080/mcp with header Authorization: Bearer <token>
+python -m unittest test_auth          # offline auth checks; no proxy or network needed
 ```
 
 ## Deploy to Cloud Run (same project as the analytics MCP)
@@ -56,7 +57,10 @@ gcloud run deploy gbp-mcp \
 If `gcloud run deploy` reports the runtime service account lacks Secret Manager access, grant
 `roles/secretmanager.secretAccessor` to that service account on both secrets.
 
-Endpoint: `https://gbp-mcp-XXXX-uc.a.run.app/mcp`. Health check: `/healthz`.
+Endpoint: `https://gbp-mcp-XXXX-uc.a.run.app/mcp`. Health check: `/health` (Cloud Run reserves URL
+paths ending in `z`, so `/healthz` returns Google's own 404 there and never reaches the server).
+The server fails closed: if `MCP_BEARER_TOKEN` is unset, every path except the health check returns
+503 `server not configured`.
 
 ## Add to claude.ai
 
