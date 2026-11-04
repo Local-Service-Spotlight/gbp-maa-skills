@@ -10,7 +10,7 @@ The methodology is Dennis Yu's Local Service Spotlight approach; the skills mirr
 
 | Component | What it does |
 |---|---|
-| **skills/gbp-maa** | The weekly report. Freshness window with the 8-day lag rule, roster screen (duplicates, closed, unverified), seven fixed pulls, primary action by vertical, swing decomposition, 16 hygiene checks, 7 tripwires, QA gate. First-Run (team-gated) and Recurring (owner-facing, guarded) modes; Trial mode for the Maps Visibility Trial verdict. |
+| **skills/gbp-maa** | The weekly report. Freshness window with the 10-day lag rule, roster screen (duplicates, closed, unverified), seven fixed pulls, primary action by vertical, swing decomposition, 16 hygiene checks, 7 tripwires, QA gate. First-Run (team-gated) and Recurring (owner-facing, guarded) modes; Trial mode for the Maps Visibility Trial verdict. |
 | **skills/gbp-client-view** | The final render. Turns a finished MAA into the one-page executive summary (HTML + PDF). Derives, never invents. Shares the renderer with `ga4-client-view`. |
 | **mcp/** | `gbp-mcp`: Python FastMCP on Cloud Run, seven read tools, bearer-gated, holds only the proxy key. |
 | **proxy/** | The Pipedream workflow that holds the Google OAuth and exposes six read-only, allowlisted operations. |

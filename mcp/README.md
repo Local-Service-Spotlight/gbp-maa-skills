@@ -20,16 +20,17 @@ proxy key.
 |---|---|---|
 | `GBP_PROXY_URL` | yes | `https://YOUR-TRIGGER.m.pipedream.net` |
 | `GBP_PROXY_KEY` | yes | same value as the Pipedream `GBP_PROXY_KEY` secret |
-| `MCP_BEARER_TOKEN` | recommended | any long random string; clients send `Authorization: Bearer <token>` |
+| `MCP_BEARER_TOKEN` | yes | any long random string; clients send `Authorization: Bearer <token>`. If unset, the server fails closed (503 on every path except the health check) |
 | `GBP_LAG_DAYS` | no | default 5; set to 8 in production (impressions lag ~8 days, actions less) |
 
 ## Local test
 
 ```bash
 pip install -r requirements.txt
-GBP_PROXY_URL=... GBP_PROXY_KEY=... python server.py
+GBP_PROXY_URL=... GBP_PROXY_KEY=... MCP_BEARER_TOKEN=... python server.py
 # in another shell
-npx @modelcontextprotocol/inspector   # connect to http://localhost:8080/mcp
+npx @modelcontextprotocol/inspector   # connect to http://localhost:8080/mcp with header Authorization: Bearer <token>
+python -m unittest test_auth          # offline auth checks; no proxy or network needed
 ```
 
 ## Deploy to Cloud Run (same project as the analytics MCP)
@@ -56,7 +57,10 @@ gcloud run deploy gbp-mcp \
 If `gcloud run deploy` reports the runtime service account lacks Secret Manager access, grant
 `roles/secretmanager.secretAccessor` to that service account on both secrets.
 
-Endpoint: `https://gbp-mcp-XXXX-uc.a.run.app/mcp`. Health check: `/healthz`.
+Endpoint: `https://gbp-mcp-XXXX-uc.a.run.app/mcp`. Health check: `/health` (Cloud Run reserves URL
+paths ending in `z`, so `/healthz` returns Google's own 404 there and never reaches the server).
+The server fails closed: if `MCP_BEARER_TOKEN` is unset, every path except the health check returns
+503 `server not configured`.
 
 ## Add to claude.ai
 

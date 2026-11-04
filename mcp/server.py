@@ -4,6 +4,7 @@ Every tool is a thin call to the Pipedream GBP proxy, which holds the Google OAu
 This server holds only the proxy key. Deployed on Cloud Run, streamable HTTP, stateless.
 """
 
+import hmac
 import json
 import os
 import re
@@ -19,7 +20,7 @@ from starlette.responses import JSONResponse
 
 PROXY_URL = os.environ["GBP_PROXY_URL"]
 PROXY_KEY = os.environ["GBP_PROXY_KEY"]
-MCP_TOKEN = os.environ.get("MCP_BEARER_TOKEN")  # optional client auth
+MCP_TOKEN = os.environ.get("MCP_BEARER_TOKEN")  # required: without it every non-health path returns 503
 LAG_DAYS = int(os.environ.get("GBP_LAG_DAYS", "5"))
 
 mcp = FastMCP("gbp_mcp", stateless_http=True, json_response=True, host="0.0.0.0", port=int(os.environ.get("PORT", "8080")))
@@ -110,7 +111,7 @@ class MediaPostsInput(LocationInput):
 class FreshnessInput(BaseModel):
     model_config = ConfigDict(extra="forbid")
     weeks: int = Field(default=13, ge=1, le=52, description="How many full weeks of history the window should cover.")
-    lag_days: Optional[int] = Field(default=None, ge=0, le=30, description="Days to cut off the end of the window for Google's reporting lag. The gbp-maa skill owns this value (currently 8: impressions finish posting ~8 days out, actions sooner). Omit to use the server default.")
+    lag_days: Optional[int] = Field(default=None, ge=0, le=30, description="Days to cut off the end of the window for Google's reporting lag. The gbp-maa skill owns this value (currently 10: impressions finish posting about 10 days out, actions sooner). Omit to use the server default.")
 
 
 RO = {"readOnlyHint": True, "destructiveHint": False, "idempotentHint": True, "openWorldHint": True}
@@ -228,14 +229,21 @@ async def gbp_get_media_posts(params: MediaPostsInput) -> str:
 
 
 # ---------------------------------------------------------------- auth + app
+# Cloud Run reserves URL paths ending in "z", so /healthz never reaches the container
+# there; /health is the one that works. /healthz stays for local and other hosts.
+HEALTH_PATHS = {"/health", "/healthz"}
+
+
 class BearerAuth(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
-        if request.url.path == "/healthz":
+        if request.url.path in HEALTH_PATHS:
             return JSONResponse({"ok": True})
-        if MCP_TOKEN:
-            auth = request.headers.get("authorization", "")
-            if auth != f"Bearer {MCP_TOKEN}":
-                return JSONResponse({"error": "unauthorized"}, status_code=401)
+        if not MCP_TOKEN:
+            # Fail closed: with no token configured, serve nothing but the health check.
+            return JSONResponse({"error": "server not configured"}, status_code=503)
+        auth = request.headers.get("authorization", "")
+        if not hmac.compare_digest(auth.encode(), f"Bearer {MCP_TOKEN}".encode()):
+            return JSONResponse({"error": "unauthorized"}, status_code=401)
         return await call_next(request)
 
 

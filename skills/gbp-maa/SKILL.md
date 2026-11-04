@@ -2,7 +2,7 @@
 name: gbp-maa
 description: "Produce the weekly Google Business Profile (GBP) report for any local business using the gbp_mcp connector (Pipedream proxy → Cloud Run MCP; no data warehouse). Establishes data trust first (roster check, reporting-lag cutoff, duplicate/closed/unverified screens), picks the vertical's primary action metric, answers the owner questions (are more people finding us on Maps, are they acting, what changed, what to do), and outputs the client-facing report in the Local Service Spotlight format. Also runs the Maps Visibility Trial verdict (trial vs 3x baseline) as a second mode. Trigger on: \"GBP report/MAA for [client]\", \"Maps report\", \"run the GBP agent\", \"how is [client]'s Google Business Profile doing\", \"are we showing up on Maps\", \"trial verdict for [client]\", weekly GBP reporting runs, or any request to analyze a Google Business Profile. GBP only — website behavior belongs to the GA4 agent, paid to Google Ads, organic search terms to GSC."
 author: Daniel Goodrich — Local Service Spotlight
-version: 1.0.0
+version: 1.0.2
 category: Strategy & Measurement
 stage: —
 definitive_article: GAP — to be written
@@ -37,13 +37,13 @@ This skill produces the weekly Google Business Profile report that goes to a bus
 
 **Prerequisites with checked outputs:**
 - `gbp_list_locations` returns the client's `location_id`(s) (checked in Phase 0.3).
-- `gbp_get_data_freshness` returns a window whose `end_date` is at least 8 days before today (Phase 0.2).
+- `gbp_get_data_freshness` returns a window whose `end_date` is at least 10 days before today (Phase 0.2).
 
 **Missing-access rule (the only one):** if any of the above is missing, stop, write a one-paragraph hand-off naming which item is missing and which function restores it (analytics for the connector, client success for vault or profile access), and do not produce a report on partial pulls.
 
 ## Steps
 
-1. Phase 0: read config, get freshness window (`lag_days: 8`), screen the roster, confirm liveness.
+1. Phase 0: read config, get freshness window (`lag_days: 10`), screen the roster, confirm liveness.
 2. Phase 1: the seven-pull Standard Pull; compute the working table in code and assert sums against Google's totals.
 3. Phase 2: lock or apply the vertical's primary metric; decompose any ≥ 20% swing (2.6).
 4. Phase 3: run hygiene checks H1–H16; grade clarity; Recurring runs pass the tripwire gate (3.5).
@@ -57,7 +57,7 @@ The full procedure for each phase is below under "Run modes" onward.
 ## Definition of done (QA checklist)
 
 - [ ] Working table exists with every number re-summed from daily rows; sums equal Google's totals (assertion output pasted in the internal notes).
-- [ ] Window used equals `gbp_get_data_freshness` output with `lag_days: 8`; no date after `end_date` appears anywhere.
+- [ ] Window used equals `gbp_get_data_freshness` output with `lag_days: 10`; no date after `end_date` appears anywhere.
 - [ ] Every claim in the report traces to a working-table row; every number has a comparison.
 - [ ] Lint passes: zero banned-vocabulary hits, ≤ 1 em-dash, under 550 prose words, actions in future tense.
 - [ ] Self-grade against `references/grading-rubric.md` recorded; one revision on any fail.
@@ -87,7 +87,7 @@ The full procedure for each phase is below under "Run modes" onward.
 | Threshold or rule | Label |
 |---|---|
 | Google withholds keyword counts under 15 searches | Google-published (Performance API docs) |
-| Impressions post ~8 days later than actions; cutoff 8 days | Observed in the first run (2026-09-21); house rule until contradicted |
+| Impressions post about 10 days late, actions sooner; cutoff 10 days | Observed: the first run (2026-09-21) showed impressions still at zero on days 6–8, and the 2026-09-24/25 follow-up found impressions post about 10 days late; house rule until contradicted |
 | Single-day spike: > 25% of a surface's period total or > 10× median day | House heuristic |
 | Stable band: ±10% on a base under 30 | House heuristic |
 | Reply coverage target 80%; photo staleness 90 days; post staleness 60 days | House heuristic |
@@ -133,7 +133,7 @@ No locked config → you are in First-Run. Produce one.
 ## Phase 0 — Pre-flight (never skip)
 
 1. **Read the client config** `{client_vault}/{client}/locked-config-gbp.md` (`references/locked-config.md`). It holds the location ID(s), account ID, vertical, primary metric, roll-up rule, previous profile snapshot, and baselines. In First-Run, also read any Narrative and seed the config at writeback.
-2. **Freshness window.** Call `gbp_get_data_freshness` with `weeks: 13, lag_days: 8`. The lag lives here, in the skill, not in the server: 8 days because impressions were still posting zero on days 6–8 before today in the first client run while actions had already landed. Record `current_period`, `previous_period`, `last_full_month`. Every later pull uses these dates. If the tool rejects `lag_days` (older server build), compute the same window yourself: end = today − 8, start = end − 90, previous = the 91 days before that. Revisit the value when H16 fires or stops firing two runs in a row.
+2. **Freshness window.** Call `gbp_get_data_freshness` with `weeks: 13, lag_days: 10`. The lag lives here, in the skill, not in the server: 10 days because Google posts impressions about 10 days late while actions land sooner (Daniel Goodrich's 2026-09-24/25 finding; the first client run on 2026-09-21 had already shown impressions still posting zero on days 6–8 before today). Record `current_period`, `previous_period`, `last_full_month`. Every later pull uses these dates. If the tool rejects `lag_days` (older server build), compute the same window yourself: end = today − 10, start = end − 90, previous = the 91 days before that. Revisit the value when H16 fires or stops firing two runs in a row.
 3. **Roster check.** Call `gbp_list_locations`. Confirm every locked `location_id` is present and its `title` still matches. Then screen the row:
 
 | Condition | Verdict | Action |
@@ -207,7 +207,7 @@ Never narrate a swing you have not decomposed. Lay current beside previous for: 
 | H12 | Brand dependence | P3 | non-brand share of keyword impressions under 30% | Found by name only |
 | H13 | Reporting gap | P1 | a day in the window where every metric is 0 and neighbors are not | Google reporting gap on <date> (footnote, not a finding) |
 | H15 | Single-day spike | P1 | one day carries more than 25% of a surface's period total, or exceeds 10× the median day | Anomalous day on <date>: report the period both with and without it; commit to a check, never a cause |
-| H16 | Trailing impression lag | P1 | impressions read 0 on the last 1–3 days of the window while actions are non-zero | Impressions lag longer than actions; footnote the dates, and if it recurs two runs running, raise `GBP_LAG_DAYS` to 8 |
+| H16 | Trailing impression lag | P1 | impressions read 0 on the last 1–3 days of the window while actions are non-zero | Impressions lag longer than actions; footnote the dates, and if it recurs two runs running, raise `lag_days` above 10 |
 | H14 | Snapshot diff | P6 vs config | category, hours, phone, website, or address changed since last run | Profile edited (name the field) |
 
 Clarity grade for the internal log: Clear (H1, H13, H14 all clean) · Hazy (H13 or H14 fired) · Opaque (H1 fired, or a duplicate `place_id` unresolved). Hygiene flags H2–H12 are actions, not clarity.

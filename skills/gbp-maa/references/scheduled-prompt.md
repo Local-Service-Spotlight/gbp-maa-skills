@@ -7,8 +7,8 @@ Run the gbp-maa skill for the client below. Follow SKILL.md phases 0 through 7 i
 
 PARAMETERS
 client: Target Painting & Contracting
-client_vault: 02-Clients/Target-Painting
-locked_config: 02-Clients/Target-Painting/locked-config-gbp.md
+client_vault: accounts/target-painting       # in google-ads-maa-vault
+locked_config: accounts/target-painting/locked-config-gbp.md
 locations:
   - locations/14620019306909596262   # Andover
   - locations/5306670257346298793    # Sudbury
@@ -17,11 +17,11 @@ vertical: service-area
 primary_metric: CALL_CLICKS
 rollup: per-location
 mode: recurring                      # first-run | recurring
-owner: Daniel Goodrich
+owner: <account lead>
 deliver_to: draft                    # draft | basecamp:<project> (drafts only; a human sends)
 
 RULES
-- Use the window from gbp_get_data_freshness (weeks 13, lag_days 8). Never include today or the lag days.
+- Use the window from gbp_get_data_freshness (weeks 13, lag_days 10). Never include today or the lag days.
 - Key everything by location_id. Never sum locations unless rollup says so.
 - Compute every number from pulled rows before writing a sentence.
 - If a tool fails twice, stop, write the escalation memo naming the layer that failed, and do not fabricate.
