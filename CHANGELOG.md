@@ -2,7 +2,7 @@
 
 ## 1.0.2, 2026-11-04
 
-Handoff fixes after Daniel Goodrich's departure (2026-11-02). Nothing here is deployed; the Cloud Run `gbp-mcp` service still runs the old build until someone with Cloud Run rights redeploys it.
+Maintenance release. The `mcp/` changes take effect only when someone with Cloud Run rights redeploys `gbp-mcp`; this release deploys nothing.
 
 - `gbp-maa`: reporting lag moved from 8 to 10 days (`lag_days: 10` in Phase 0, the QA checklist, Inputs and step 2; the hand-computed fallback is now end = today − 10). Daniel's 2026-09-24/25 check found Google posts impressions about 10 days late. H16 now says raise `lag_days` above 10. The skill's frontmatter version is 1.0.2.
 - `gbp-maa` scheduled-prompt template: the Target Painting example points at `accounts/target-painting` in google-ads-maa-vault instead of the BlitzBase `02-Clients/` paths, `owner` is `<account lead>`, and the rules line passes `lag_days 10`. `deliver_to` stays `draft`.
