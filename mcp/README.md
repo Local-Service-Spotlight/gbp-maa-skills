@@ -20,7 +20,7 @@ proxy key.
 |---|---|---|
 | `GBP_PROXY_URL` | yes | `https://YOUR-TRIGGER.m.pipedream.net` |
 | `GBP_PROXY_KEY` | yes | same value as the Pipedream `GBP_PROXY_KEY` secret |
-| `MCP_BEARER_TOKEN` | recommended | any long random string; clients send `Authorization: Bearer <token>` |
+| `MCP_BEARER_TOKEN` | yes | any long random string; clients send `Authorization: Bearer <token>`. If unset, the server fails closed (503 on every path except the health check) |
 | `GBP_LAG_DAYS` | no | default 5; set to 8 in production (impressions lag ~8 days, actions less) |
 
 ## Local test
